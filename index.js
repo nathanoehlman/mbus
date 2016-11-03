@@ -28,17 +28,16 @@ var createBus = module.exports = function(namespace, parent, scope) {
     var args = [].slice.call(arguments, 1);
     var delimited = normalize(name);
     var handlers = registry[delimited] || [];
-    var results;
+    var results = [];
 
     // send through the feeds
     feeds.forEach(function(feed) {
       feed({ name: delimited, args: args });
     });
 
-    // run the registered handlers
-    results = [].concat(handlers).map(function(handler) {
-      return handler.apply(scope || this, args);
-    });
+    for (var i = 0; i < handlers.length; i++) {
+      results.push(handlers[i].apply(scope || handlers[i], args));
+    }
 
     // run the parent handlers
     if (bus.parent) {
